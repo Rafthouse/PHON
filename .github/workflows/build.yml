@@ -1,0 +1,106 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  CMAKE_BUILD_TYPE: Release
+  JUCE_VERSION: 7.0.12
+
+jobs:
+  # ── Linux ──────────────────────────────────────────────────────────────
+  linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libjack-jackd2-dev libx11-dev libxinerama-dev \
+            libxext-dev libxrandr-dev libxcursor-dev libxcomposite-dev \
+            libwebkit2gtk-4.1-dev libcurl4-openssl-dev libfreetype6-dev
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }}
+
+      - name: Build
+        run: cmake --build build --parallel $(nproc)
+
+      - name: Archive VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: PHON-Linux-x86_64
+          path: build/PHON_artefacts/${{ env.CMAKE_BUILD_TYPE }}/VST3/
+
+  # ── macOS ──────────────────────────────────────────────────────────────
+  macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} \
+          -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+
+      - name: Build
+        run: cmake --build build --parallel $(sysctl -n hw.logicalcpu)
+
+      - name: Archive VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: PHON-macOS-Universal
+          path: build/PHON_artefacts/${{ env.CMAKE_BUILD_TYPE }}/VST3/
+
+  # ── Windows ────────────────────────────────────────────────────────────
+  windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }}
+
+      - name: Build
+        run: cmake --build build --parallel $env:NUMBER_OF_PROCESSORS
+
+      - name: Archive VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: PHON-Windows-x86_64
+          path: build/PHON_artefacts/${{ env.CMAKE_BUILD_TYPE }}/VST3/
+
+  # ── Tests ──────────────────────────────────────────────────────────────
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libjack-jackd2-dev libx11-dev libxinerama-dev \
+            libxext-dev libxrandr-dev libxcursor-dev libxcomposite-dev \
+            libwebkit2gtk-4.1-dev libcurl4-openssl-dev libfreetype6-dev
+
+      - name: Configure with tests
+        run: cmake -B build -DBUILD_TESTS=ON
+
+      - name: Build tests
+        run: cmake --build build --parallel $(nproc) --target PHON_Tests
+
+      - name: Run tests
+        run: ./build/Tests/PHON_Tests

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://rattosaurus.lab/phon/typography-schema.json",
+  "version": "1.0.0",
+  "description": "Rattosaurus Design System — Typography Tokens for PHON",
+  "fonts": {
+    "display": { "family": "Oswald", "weights": [300, 400, 500, 600, 700], "fallback": "'Arial Narrow', Arial, sans-serif" },
+    "mono": { "family": "Share Tech Mono", "fallback": "monospace" },
+    "signature": { "family": "Pirata One", "fallback": "serif" }
+  },
+  "sizes": {
+    "brand-name": "26px",
+    "knob-label": "10px",
+    "knob-value": "9px",
+    "section-label": "10px",
+    "sub-label": "9px",
+    "select-label": "10px",
+    "footer": "7px",
+    "serial": "8px",
+    "display-title": "9px",
+    "phon-readout-main": "24px",
+    "phon-readout-unit": "9px",
+    "meter-scale": "8px"
+  },
+  "letterSpacing": {
+    "brand-name": "0.14em",
+    "knob-label": "0.20em",
+    "section-label": "0.22em",
+    "select-label": "0.08em",
+    "footer": "0.10em"
+  },
+  "textTransform": {
+    "labels": "uppercase"
+  }
+}

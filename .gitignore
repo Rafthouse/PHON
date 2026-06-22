@@ -1,0 +1,38 @@
+# JUCE / CMake build outputs
+Builds/
+build/
+cmake-build-*/
+out/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.sln
+*.suo
+*.user
+*.VC.db
+.DS_Store
+Thumbs.db
+
+# JUCE
+JuceLibraryCode/
+JUCE/modules/
+
+# Compiled binaries
+*.vst3
+*.component
+*.aaxplugin
+*.exe
+*.dll
+*.dylib
+*.so
+
+# Tests
+Testing/
+TestResults/
+
+# Temp
+*.log
+*.tmp
+.DS_Store

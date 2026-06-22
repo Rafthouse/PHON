@@ -1,0 +1,32 @@
+{
+  "$schema": "https://rattosaurus.lab/phon/colors-schema.json",
+  "version": "1.0.0",
+  "description": "Rattosaurus Design System — Color Tokens for PHON",
+  "colors": {
+    "bg": { "hex": "#0a070c", "role": "Main background", "notes": "Deepest layer" },
+    "face": { "hex": "#1b1222", "role": "Panel face", "notes": "Card/panel surface" },
+    "panel": { "hex": "#241830", "role": "Panel elevated" },
+    "panel2": { "hex": "#3a2a44", "role": "Panel highlight" },
+    "edge": { "hex": "#7c4f96", "role": "Border/edge", "notes": "Purple trim" },
+    "edge-dark": { "hex": "#09060b", "role": "Shadow edge" },
+    "ivory": { "hex": "#d8c9a8", "role": "Primary text", "notes": "Warm light" },
+    "muted": { "hex": "#9a8aa6", "role": "Secondary text" },
+    "purple": { "hex": "#b06fd0", "role": "Accent primary" },
+    "purple2": { "hex": "#bd83d6", "role": "Accent glow" },
+    "brass": { "hex": "#a9864e", "role": "Brass/metal" },
+    "brass2": { "hex": "#d8c79e", "role": "Brass highlight" },
+    "amber": { "hex": "#e6a33c", "role": "Active/live", "notes": "Signal active indicator" },
+    "red": { "hex": "#b8242a", "role": "Clip/warning" },
+    "green": { "hex": "#71856a", "role": "Level OK" }
+  },
+  "functional": {
+    "meter-gradient": ["#536c4d", "#c29a42", "#a64432"],
+    "knob-arc": "#e6a33c",
+    "knob-arc-bg": "#36392f",
+    "select-led-on": "#e6a33c",
+    "select-led-off": "#4d5044",
+    "bypass-off-pulse": "rgba(226,139,39,.18)",
+    "glow-purple": "rgba(176,111,208,.34)",
+    "glow-amber": "rgba(230,163,60,.45)"
+  }
+}

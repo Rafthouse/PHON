@@ -28,10 +28,8 @@ int main (int argc, char* argv[])
     for (int i = 0; i < results; ++i)
         fails += runner.getResult (i)->failures;
 
-    juce::Logger::outputDebugString (
-        "PHON tests complete — "
-        + juce::String (results) + " test cases, "
-        + juce::String (fails)   + " failures.");
+    // stdout, not the debug log, so CI and terminals show the summary.
+    std::cout << "PHON tests complete — " << results << " test cases, " << fails << " failures." << std::endl;
 
     return fails > 0 ? 1 : 0;
 }

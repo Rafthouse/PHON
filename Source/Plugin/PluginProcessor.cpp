@@ -56,6 +56,8 @@ void PhPluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     };
 
     processor_.prepare(spec);
+    preSpectrum_.prepare(sampleRate);
+    postSpectrum_.prepare(sampleRate);
 }
 
 void PhPluginProcessor::releaseResources()
@@ -87,7 +89,9 @@ void PhPluginProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::Mid
                                    buffer.getNumChannels(),
                                    buffer.getNumSamples());
 
+    preSpectrum_.push(buffer);
     processor_.processBlock(block);
+    postSpectrum_.push(buffer);
 }
 
 // =============================================================================

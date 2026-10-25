@@ -30,8 +30,8 @@ juce_add_plugin(PHON
     COMPANY_WEBSITE              "https://rattosaurus.lab"
     COMPANY_EMAIL                "mykyta@rattosaurus.lab"
     COMPANY_COPYRIGHT            "2026 Mykyta Shchur — Rattosaurus Lab"
-    PRODUCT_NAME                 "PHON"
-    PLUGIN_NAME                  "PHON"
+    PRODUCT_NAME                 "PHONTOM"
+    PLUGIN_NAME                  "PHONTOM"
     PLUGIN_MANUFACTURER_CODE     Ratt
     PLUGIN_CODE                  Phn0
     PLUGIN_DESCRIPTION           "Perceptual Harmonic Inflator"
@@ -54,6 +54,8 @@ target_sources(PHON PRIVATE
     Source/Plugin/PluginEditor.h
 
     # ▸ DSP
+    Source/DSP/SpectrumAnalyzer.cpp
+    Source/DSP/SpectrumAnalyzer.h
     Source/DSP/PhProcessor.cpp
     Source/DSP/PhProcessor.h
     Source/DSP/Harmonizer.cpp
@@ -114,9 +116,11 @@ if(BUILD_TESTS)
         Tests/main.cpp
         Tests/TestHarmonizer.cpp
         Tests/TestDensityShaper.cpp
+        Tests/TestSpectrumAnalyzer.cpp
         # DSP sources must be compiled in, or the test binary fails to link.
         Source/DSP/Harmonizer.cpp
         Source/DSP/DensityShaper.cpp
+        Source/DSP/SpectrumAnalyzer.cpp
     )
     target_include_directories(PHON_Tests PRIVATE Source/DSP)
     target_link_libraries(PHON_Tests PRIVATE juce::juce_core juce::juce_dsp)

@@ -20,13 +20,29 @@ PhPluginEditor::PhPluginEditor (PhPluginProcessor& processor)
     // FP-LATER: Instantiate custom UI components here (PhKnob, PhSelect, etc.)
     //           and attach them to apvts_ via SliderAttachment / ButtonAttachment.
 
+    addAndMakeVisible (display_);
+
+    for (auto* button : { &preButton_, &postButton_ })
+    {
+        button->setClickingTogglesState (true);
+        button->setToggleState (true, juce::dontSendNotification);
+        addAndMakeVisible (button);
+    }
+
+    preButton_.onClick  = [this] { display_.setShowPre  (preButton_.getToggleState()); };
+    postButton_.onClick = [this] { display_.setShowPost (postButton_.getToggleState()); };
+
     setSize (750, 500);
     setResizable (true, false);
     setResizeLimits (375, 250, 1500, 1000);
+
+    startTimerHz (30);
 }
 
 PhPluginEditor::~PhPluginEditor()
 {
+    stopTimer();
+
     apvts_.removeParameterListener ("input",        this);
     apvts_.removeParameterListener ("output",       this);
     apvts_.removeParameterListener ("amount",       this);
@@ -58,7 +74,13 @@ void PhPluginEditor::paint (juce::Graphics& g)
 
 void PhPluginEditor::resized()
 {
-    // FP-LATER: Lay out UI child components per Design/tokens/layout.json
+    // FP-LATER: Lay out the remaining UI components per Design/tokens/layout.json.
+    // Display position follows layout.json: left 126, top 78, 498 x 190.
+    display_.setBounds (126, 78, 498, 190);
+
+    // Switches sit in the display's header row, right-aligned.
+    postButton_.setBounds (display_.getRight() - 8 - 56, display_.getY() + 8, 56, 20);
+    preButton_.setBounds  (postButton_.getX() - 6 - 56,  display_.getY() + 8, 56, 20);
 }
 
 // =============================================================================
@@ -66,4 +88,15 @@ void PhPluginEditor::parameterChanged (const juce::String& paramID, float newVal
 {
     // FP-LATER: Push live parameter changes to the display/animation layer.
     juce::ignoreUnused (paramID, newValue);
+}
+
+void PhPluginEditor::timerCallback()
+{
+    auto& pre  = processor_.getPreSpectrum();
+    auto& post = processor_.getPostSpectrum();
+
+    pre.pullSpectrum();
+    post.pullSpectrum();
+
+    display_.setSpectra (pre.getMagnitudesDb(), post.getMagnitudesDb(), pre.getSampleRate());
 }

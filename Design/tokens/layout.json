@@ -1,6 +1,6 @@
 {
   "$schema": "https://rattosaurus.lab/phon/layout-schema.json",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Rattosaurus Design System — Layout Tokens for PHON",
   "shell": {
     "width": 750,
@@ -9,10 +9,14 @@
     "screwSize": 12
   },
   "topbar": {
-    "top": 16,
+    "top": 12,
     "left": 32,
     "right": 48,
-    "height": 54
+    "height": 64,
+    "brandStack": "name, tagline, author; left-aligned",
+    "controlRow": { "labelTop": 20, "controlHeight": 32, "gap": 16 },
+    "brandSignature": "after tagline",
+    "actionsGap": 10
   },
   "display": {
     "left": 126,
@@ -43,10 +47,12 @@
     "large": { "diameter": 96, "arcStart": -135, "arcSpan": 270 },
     "hero": { "diameter": 118, "arcStart": -135, "arcSpan": 270 },
     "small": { "diameter": 66, "arcStart": -135, "arcSpan": 270 },
-    "amount": { "left": 146, "top": 18 },
-    "phon": { "left": 300, "top": 4 },
-    "density": { "left": 462, "top": 18 },
-    "mix": { "left": 610, "top": 12 }
+    "slotHeight": 118,
+    "centerLine": 66,
+    "amount": { "left": 176, "top": 7 },
+    "phon": { "left": 290, "top": 7 },
+    "density": { "left": 426, "top": 7 },
+    "mix": { "left": 565, "top": 7 }
   },
   "characterPanel": {
     "left": 8,
@@ -61,15 +67,14 @@
     "toggleHeight": 22
   },
   "oversampling": {
-    "right": 0,
-    "top": 124,
-    "width": 132
+    "placement": "topbar, left of PROCESS",
+    "width": 118
   },
   "bypass": {
-    "right": 8,
-    "top": 53,
-    "width": 118,
-    "buttonDiameter": 48
+    "placement": "topbar, right",
+    "width": 112,
+    "height": 38,
+    "buttonDiameter": 28
   },
   "footer": {
     "left": 31,
@@ -79,7 +84,6 @@
   },
   "zIndex": {
     "character": 20,
-    "oversampling": 21,
     "tooltip": 99,
     "selectMenu": 90
   }

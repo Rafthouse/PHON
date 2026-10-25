@@ -15,14 +15,10 @@ FetchContent_Declare(
     GIT_TAG        7.0.12
     GIT_SHALLOW    TRUE
 )
-FetchContent_GetProperties(JUCE)
-if(NOT juce_POPULATED)
-    message(STATUS "Downloading JUCE 7.0.12 …")
-    FetchContent_Populate(JUCE)
-endif()
-list(APPEND CMAKE_MODULE_PATH "${juce_SOURCE_DIR}/cmake")
+# add_subdirectory() via MakeAvailable: JUCE's CMake package only exists in its
+# build tree, so find_package(JUCE) cannot resolve a bare source checkout.
+FetchContent_MakeAvailable(JUCE)
 
-find_package(JUCE CONFIG REQUIRED)
 juce_add_plugin(PHON
     # ▸ Format support
     VST3_ONLY                    TRUE
@@ -113,13 +109,17 @@ target_link_libraries(PHON PRIVATE PHON_BinaryData)
 option(BUILD_TESTS "Build the unit-test suite" OFF)
 if(BUILD_TESTS)
     enable_testing()
-    add_executable(PHON_Tests
+    juce_add_console_app(PHON_Tests PRODUCT_NAME "PHON Tests")
+    target_sources(PHON_Tests PRIVATE
         Tests/main.cpp
         Tests/TestHarmonizer.cpp
         Tests/TestDensityShaper.cpp
+        # DSP sources must be compiled in, or the test binary fails to link.
+        Source/DSP/Harmonizer.cpp
+        Source/DSP/DensityShaper.cpp
     )
     target_include_directories(PHON_Tests PRIVATE Source/DSP)
-    target_link_libraries(PHON_Tests PRIVATE juce::juce_recommended_test_helpers)
+    target_link_libraries(PHON_Tests PRIVATE juce::juce_core juce::juce_dsp)
     add_test(NAME PHON_Tests COMMAND PHON_Tests)
 endif()
 

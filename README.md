@@ -1,6 +1,6 @@
 # PHON — Perceptual Harmonic Inflator
 
-<img src="Design/Prototypes/index.html" alt="UI Prototype" width="100%" />
+**UI prototype:** [`docs/index.html`](docs/index.html) (GitHub Pages copy of [`Design/Prototypes/index.html`](Design/Prototypes/index.html))
 
 **PHON** is an audio plugin (VST3 / AU) that inflates harmonic content by correlating generated harmonics with the ISO 226 equal‑loudness contour — the psychacoustic model behind the *phon* scale.
 

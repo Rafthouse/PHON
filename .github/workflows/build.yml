@@ -2,10 +2,10 @@ name: Build & Test
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ master, develop ]
     tags: [ 'v*' ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
   workflow_dispatch:
 
 env:
@@ -103,4 +103,4 @@ jobs:
         run: cmake --build build --parallel $(nproc) --target PHON_Tests
 
       - name: Run tests
-        run: ./build/Tests/PHON_Tests
+        run: ./build/PHON_Tests

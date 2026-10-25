@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "PhProcessor.h"
+#include "SpectrumAnalyzer.h"
 
 // =============================================================================
 /** PHON — Perceptual Harmonic Inflator
@@ -37,7 +38,7 @@ public:
     void setStateInformation(const void* data, int sizeInBytes) override;
 
     // ── Metadata ─────────────────────────────────────────────────────────
-    const juce::String getName() const override       { return "PHON"; }
+    const juce::String getName() const override       { return "PHONTOM"; }
     bool acceptsMidi() const noexcept override         { return false; }
     bool producesMidi() const noexcept override        { return false; }
     double getTailLengthSeconds() const override       { return 0.0; }
@@ -51,12 +52,19 @@ public:
     juce::AudioProcessorValueTreeState& getAPVTS() noexcept { return apvts_; }
     const PhProcessor& getProcessor() const noexcept        { return processor_; }
 
+    // ── Spectrum taps (PRE = dry input, POST = after the chain) ──────────
+    SpectrumAnalyzer& getPreSpectrum() noexcept             { return preSpectrum_; }
+    SpectrumAnalyzer& getPostSpectrum() noexcept            { return postSpectrum_; }
+
 private:
     // ── Parameters ───────────────────────────────────────────────────────
     juce::AudioProcessorValueTreeState apvts_;
 
     // ── DSP ──────────────────────────────────────────────────────────────
     PhProcessor processor_;
+
+    SpectrumAnalyzer preSpectrum_;
+    SpectrumAnalyzer postSpectrum_;
 
     // =====================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PhPluginProcessor)

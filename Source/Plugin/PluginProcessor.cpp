@@ -56,6 +56,8 @@ void PhPluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     };
 
     processor_.prepare(spec);
+    preSpectrum_.prepare(sampleRate);
+    postSpectrum_.prepare(sampleRate);
 }
 
 void PhPluginProcessor::releaseResources()
@@ -87,7 +89,9 @@ void PhPluginProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::Mid
                                    buffer.getNumChannels(),
                                    buffer.getNumSamples());
 
+    preSpectrum_.push(buffer);
     processor_.processBlock(block);
+    postSpectrum_.push(buffer);
 }
 
 // =============================================================================
@@ -99,17 +103,16 @@ juce::AudioProcessorEditor* PhPluginProcessor::createEditor()
 // =============================================================================
 void PhPluginProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
-    if (auto state = apvts_.copyState(); ! state.isValid())
-        juce::MemoryOutputStream(destData).writeString("{}");
-    else
-        juce::MemoryOutputStream(destData).writeString(state.toXmlString());
+    const auto state = apvts_.copyState();
+    if (auto xml = state.createXml())
+        copyXmlToBinary (*xml, destData);
 }
 
 void PhPluginProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-    auto xml = juce::XmlDocument::parse(juce::String::createStringFromData(data, sizeInBytes));
-    if (xml != nullptr)
-        apvts_.replaceState(juce::ValueTree::fromXml(*xml));
+    if (auto xml = getXmlFromBinary (data, sizeInBytes))
+        if (xml->hasTagName (apvts_.state.getType()))
+            apvts_.replaceState (juce::ValueTree::fromXml (*xml));
 }
 
 // =============================================================================

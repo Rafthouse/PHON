@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "PhDisplay.h"
 
 // =============================================================================
 /** PHON editor.
@@ -9,9 +10,13 @@
  *  Composes the custom UI components declared in Source/UI/.
  *  All attachment objects (SliderAttachment, ButtonAttachment, …) live here
  *  so they stay alive for the lifetime of the editor.
+ *
+ *  A 30 Hz timer pulls the PRE / POST spectra from the processor and hands
+ *  them to the display on the message thread.
  */
 class PhPluginEditor final : public juce::AudioProcessorEditor,
-                             private juce::AudioProcessorValueTreeState::Listener
+                             private juce::AudioProcessorValueTreeState::Listener,
+                             private juce::Timer
 {
 public:
     explicit PhPluginEditor (PhPluginProcessor&);
@@ -24,6 +29,13 @@ private:
     // ── Reference ─────────────────────────────────────────────────────────
     PhPluginProcessor& processor_;
     juce::AudioProcessorValueTreeState& apvts_;
+
+    // ── Display + spectrum switches ───────────────────────────────────────
+    PhDisplay          display_;
+    juce::TextButton   preButton_  { "PRE" };
+    juce::TextButton   postButton_ { "POST" };
+
+    void timerCallback() override;
 
     // ── Parameter attachments ─────────────────────────────────────────────
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>  inputAttach_;

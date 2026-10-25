@@ -15,14 +15,10 @@ FetchContent_Declare(
     GIT_TAG        7.0.12
     GIT_SHALLOW    TRUE
 )
-FetchContent_GetProperties(JUCE)
-if(NOT juce_POPULATED)
-    message(STATUS "Downloading JUCE 7.0.12 …")
-    FetchContent_Populate(JUCE)
-endif()
-list(APPEND CMAKE_MODULE_PATH "${juce_SOURCE_DIR}/cmake")
+# add_subdirectory() via MakeAvailable: JUCE's CMake package only exists in its
+# build tree, so find_package(JUCE) cannot resolve a bare source checkout.
+FetchContent_MakeAvailable(JUCE)
 
-find_package(JUCE CONFIG REQUIRED)
 juce_add_plugin(PHON
     # ▸ Format support
     VST3_ONLY                    TRUE
@@ -34,8 +30,8 @@ juce_add_plugin(PHON
     COMPANY_WEBSITE              "https://rattosaurus.lab"
     COMPANY_EMAIL                "mykyta@rattosaurus.lab"
     COMPANY_COPYRIGHT            "2026 Mykyta Shchur — Rattosaurus Lab"
-    PRODUCT_NAME                 "PHON"
-    PLUGIN_NAME                  "PHON"
+    PRODUCT_NAME                 "PHONTOM"
+    PLUGIN_NAME                  "PHONTOM"
     PLUGIN_MANUFACTURER_CODE     Ratt
     PLUGIN_CODE                  Phn0
     PLUGIN_DESCRIPTION           "Perceptual Harmonic Inflator"
@@ -58,6 +54,8 @@ target_sources(PHON PRIVATE
     Source/Plugin/PluginEditor.h
 
     # ▸ DSP
+    Source/DSP/SpectrumAnalyzer.cpp
+    Source/DSP/SpectrumAnalyzer.h
     Source/DSP/PhProcessor.cpp
     Source/DSP/PhProcessor.h
     Source/DSP/Harmonizer.cpp
@@ -107,19 +105,27 @@ juce_add_binary_data(PHON_BinaryData
     NAMESPACE
         PhBinaryData
 )
-target_link_libraries(PHON PRIVATE PHON_BinaryData)
+target_link_libraries(PHON PRIVATE PHON_BinaryData juce::juce_dsp)
 
 # ── Tests ────────────────────────────────────────────────────────────────────
 option(BUILD_TESTS "Build the unit-test suite" OFF)
 if(BUILD_TESTS)
     enable_testing()
-    add_executable(PHON_Tests
+    juce_add_console_app(PHON_Tests PRODUCT_NAME "PHON Tests")
+    target_sources(PHON_Tests PRIVATE
         Tests/main.cpp
         Tests/TestHarmonizer.cpp
         Tests/TestDensityShaper.cpp
+        Tests/TestSpectrumAnalyzer.cpp
+        # DSP sources must be compiled in, or the test binary fails to link.
+        Source/DSP/Harmonizer.cpp
+        Source/DSP/DensityShaper.cpp
+        Source/DSP/SpectrumAnalyzer.cpp
     )
     target_include_directories(PHON_Tests PRIVATE Source/DSP)
-    target_link_libraries(PHON_Tests PRIVATE juce::juce_recommended_test_helpers)
+    target_link_libraries(PHON_Tests PRIVATE juce::juce_core juce::juce_dsp)
+    # Tests and DSP headers #include <JuceHeader.h>, which is not generated for console apps.
+    juce_generate_juce_header(PHON_Tests)
     add_test(NAME PHON_Tests COMMAND PHON_Tests)
 endif()
 

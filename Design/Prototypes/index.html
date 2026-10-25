@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PHON — Perceptual Harmonic Inflator UI Prototype v4</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Pirata+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<title>PHONTOM — Perceptual Harmonic Inflator UI Prototype v4</title>
+<!-- Fonts are bundled in fonts/ (Oswald, Pirata One, Share Tech Mono) so the design never falls back offline. -->
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
  :root {
  --bg: #0a070c;
@@ -61,10 +60,23 @@
 
  .topbar {
  position:absolute; left:32px; right:48px; top:16px; height:54px;
- display:grid; grid-template-columns:minmax(0,1fr) 118px; align-items:center; column-gap:24px;
+ display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; column-gap:24px;
  border-bottom:1px solid rgba(124,79,150,.38);
  }
+ .top-actions { display:flex; align-items:center; gap:10px; }
+ /* Header modules: OVERSAMPLING and PROCESS share one box, caption style and 28px control row. */
+ .top-actions .module { width:124px; height:48px; box-sizing:border-box; padding:5px 8px; display:flex; flex-direction:column; align-items:stretch; gap:2px;
+ border:1px solid rgba(124,79,150,.42); border-radius:6px;
+ background:linear-gradient(180deg,rgba(36,24,48,.88),rgba(12,8,15,.92));
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 2px 7px rgba(0,0,0,.32); }
+ .module-caption { font-family:'Oswald',sans-serif; font-weight:500; font-size:8px; line-height:10px; letter-spacing:.18em; color:#a99ab3; text-transform:uppercase; white-space:nowrap; }
+ .top-actions .process-top { display:flex; flex-direction:column; }
+ .top-actions .process-top .bypass-button { align-self:flex-end; flex:0 0 24px; margin:0; width:24px; height:24px; }
+ .top-actions .oversampling .popup-select { margin-top:0; }
+ .top-actions .oversampling .select-trigger { height:24px; }
+ .top-actions .oversampling .select-menu { top:calc(100% + 7px); bottom:auto; }
  .brand { min-width:0; display:flex; align-items:baseline; gap:12px; overflow:hidden; }
+ .brand .signature { flex:0 0 auto; padding:0; font-size:15px; color:#a47fbb; text-shadow:0 0 12px rgba(176,111,208,.3); }
  .brand .name { font-family:'Oswald',sans-serif; letter-spacing:.14em; font-size:26px; font-weight:700; color:var(--purple2); text-shadow:0 0 18px rgba(176,111,208,.28); }
  .brand .tag { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-family:'Oswald',sans-serif; font-weight:300; font-size:9px; letter-spacing:.28em; color:#9a8aa6; text-transform:uppercase; }
  .serial { font-family:'Share Tech Mono',monospace; font-size:8px; color:#7a6a86; letter-spacing:.08em; white-space:nowrap; }
@@ -86,10 +98,15 @@
  .display-head { position:absolute; left:14px; right:14px; top:10px; height:26px; display:flex; justify-content:space-between; align-items:center; z-index:2; }
  .display-title { font-family:'Oswald',sans-serif; font-weight:400; font-size:9px; letter-spacing:.22em; color:#9a8aa6; }
  .phon-readout { font-family:'Share Tech Mono',monospace; color:var(--amber); letter-spacing:.08em; }
+ .spectrum-toggles { display:flex; gap:6px; margin:0 auto 0 14px; }
+ .spec-toggle { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:.1em; line-height:1; padding:4px 8px; border-radius:4px; cursor:pointer;
+ border:1px solid rgba(124,79,150,.5); background:#0d0910; color:#7a6a86; }
+ .spec-toggle.on { color:var(--ivory); border-color:rgba(189,131,214,.8); box-shadow:0 0 8px rgba(176,111,208,.18); }
+ .spec-toggle:focus-visible { outline:2px solid rgba(189,131,214,.55); outline-offset:1px; }
  .phon-readout strong{font-size:24px; font-weight:500; text-shadow:0 0 12px rgba(225,139,39,.35)}
  .phon-readout span{font-size:9px; color:#9a8b70; margin-left:5px}
  #scope { position:absolute; inset:0; width:100%; height:100%; }
- .display-footer { position:absolute; left:14px; right:14px; bottom:8px; display:flex; justify-content:space-between; z-index:2; color:#7a6a86; font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:.08em; }
+ .display-footer { position:absolute; left:14px; right:14px; bottom:8px; display:flex; justify-content:space-between; z-index:2; color:#8f7f9c; font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:.08em; }
 
  .meter { position:absolute; top:192px; width:9px; height:54px; border:1px solid #3d4036; background:#070806; border-radius:3px; overflow:hidden; }
  .meter.input{left:92px}.meter.output{right:92px}
@@ -102,8 +119,12 @@
  }
 
  .knob-unit { position:absolute; text-align:center; }
- .amount{left:146px; top:18px}.phon{left:300px; top:4px}.density{left:462px; top:18px}
- .mix{left:610px; top:12px}
+ /* All four units share one 118px knob slot, so knob centres and labels sit on the same lines. */
+ .amount{left:176px; top:7px}.phon{left:290px; top:7px}.density{left:426px; top:7px}
+ .mix{left:565px; top:7px}
+ .knob-unit .knob.large { margin:11px auto; }
+ .knob-unit .knob.hero  { margin:0 auto; }
+ .knob-unit .knob.small { margin:26px auto; }
 
  .knob {
  --angle:-135deg;
@@ -116,16 +137,20 @@
  .knob.large{width:96px;height:96px}.knob.hero{width:118px;height:118px}.knob.small{width:66px;height:66px}
  .knob-face {
  position:absolute; inset:5px; border-radius:50%;
+ /* Static surface: lighting never rotates. Only .knob-pointer turns with the value. */
  background:
- radial-gradient(circle at 36% 27%, rgba(255,255,255,.20), transparent 22%),
- conic-gradient(from 25deg,#4d5045,#161813 28%,#55584b 45%,#1b1d18 70%,#44473c 91%,#4d5045);
- border:1px solid #777967;
- box-shadow:0 6px 8px rgba(0,0,0,.62), inset 0 2px 3px rgba(255,255,255,.08), inset 0 -5px 8px rgba(0,0,0,.75);
+ radial-gradient(circle at 36% 27%, rgba(255,255,255,.14), transparent 30%),
+ linear-gradient(155deg,#4b4f43 0%,#33372d 42%,#3d4136 72%,#272a22 100%);
+ border:1px solid #6a6d5c;
+ box-shadow:0 5px 7px rgba(0,0,0,.55), inset 0 1px 2px rgba(255,255,255,.07), inset 0 -4px 7px rgba(0,0,0,.6);
+ }
+ .knob-pointer {
+ position:absolute; inset:0; pointer-events:none;
  transform:rotate(var(--angle));
  }
- .knob-face::before {
- content:""; position:absolute; left:50%; top:8px; width:3px; height:20%; transform:translateX(-50%);
- background:linear-gradient(#efe7d0,#9c8e70); border-radius:2px; box-shadow:0 0 4px rgba(255,225,167,.25);
+ .knob-pointer::before {
+ content:""; position:absolute; left:50%; top:12px; width:3px; height:19%; transform:translateX(-50%);
+ background:linear-gradient(#efe7d0,#9c8e70); border-radius:2px; box-shadow:0 0 4px rgba(255,225,167,.22);
  }
  .knob::before {
  content:""; position:absolute; inset:0; border-radius:50%;
@@ -206,26 +231,103 @@
  }
  .process-top .bypass-button { margin:0; width:28px; height:28px; justify-self:end; }
  .process-top .bypass-button::before { left:12px; top:5px; width:3px; height:10px; }
- .process-top .bypass-button::after { left:7px; top:9px; width:12px; height:12px; border-width:2px; }
+ .process-top .bypass-button::after { left:6px; top:6px; width:12px; height:12px; border-width:2px; }
 
  .footerbar { position:absolute; left:31px; right:31px; bottom:3px; height:20px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; }
- .footer-left,.footer-right { font-family:'Share Tech Mono',monospace; font-size:7px; letter-spacing:.10em; color:#6f6078; }
+ .footer-left,.footer-right { font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:.10em; color:#8a7a98; }
  .footer-right { text-align:right; }
  .signature { font-family:'Pirata One',serif; font-size:18px; line-height:1; color:#9a6fb0; text-shadow:0 0 14px rgba(176,111,208,.34); white-space:nowrap; padding:0 16px; }
 
  .tooltip { position:fixed; pointer-events:none; z-index:99; padding:6px 8px; background:#090a08; border:1px solid #4d5044; border-radius:4px; color:#bdb9a8; font-size:10px; opacity:0; transform:translateY(4px); transition:.1s; max-width:220px; }
  .tooltip.show{opacity:1;transform:translateY(0)}
+ /* ── Typography and state refinements ─────────────────────────────────── */
+ .brand .tag { font-size:9px; letter-spacing:.14em; }
+ .label, .knob-label { letter-spacing:.14em; }
+ .module-caption { font-size:9px; line-height:11px; letter-spacing:.12em; }
+ .display-title { letter-spacing:.14em; }
+ .display-footer { font-size:9px; letter-spacing:.02em; color:#a293b0; }
+ .select-option span { font-size:9px; letter-spacing:.02em; color:#9d8fab; }
+ .footer-left, .footer-right { letter-spacing:.04em; color:#9a8aa6; }
+ .knob-value { font-size:10px; color:#a596b2; }
+ .toggle-text { font-family:'Oswald',sans-serif; font-weight:500; font-size:12px; letter-spacing:.14em; color:#c9b8a0; }
+ .switch-unit { width:150px; }
+ .spec-toggle { font-size:9px; letter-spacing:.06em; color:#8f7f9c; }
+ .spec-toggle.on { color:var(--ivory); }
+ .spec-toggle.on::before { content:"● "; font-size:7px; color:var(--amber); vertical-align:1px; }
+ .spec-toggle:focus-visible { outline-offset:2px; }
+ /* ── Compact controls: one component language for field, switch and state ── */
+ .field { display:grid; gap:6px; align-content:start; min-width:0; }
+ .field-label { font-family:'Oswald',sans-serif; font-weight:500; font-size:9px; line-height:11px; letter-spacing:.12em; text-transform:uppercase; color:#b6a9bd; white-space:nowrap; }
+ .top-actions .field { width:120px; }
+ .top-actions .oversampling .popup-select { margin-top:0; }
+ .top-actions .oversampling .select-trigger { height:32px; grid-template-columns:1fr 14px; font-size:11px; }
+ .top-actions .oversampling .select-menu { top:calc(100% + 7px); bottom:auto; }
+ .switch-row { display:flex; align-items:center; gap:9px; height:32px; }
+ .switch { position:relative; box-sizing:border-box; width:42px; height:24px; padding:0; flex:0 0 auto; border:1px solid #51405e; border-radius:999px; background:#120f17; cursor:pointer; }
+ .switch-thumb { position:absolute; left:3px; top:3px; width:16px; height:16px; border-radius:50%; background:#93879b; transition:transform 100ms ease; }
+ .switch.on { border-color:#b98531; background:#47331a; }
+ .switch.on .switch-thumb { transform:translateX(18px); background:#e6a33c; }
+ .state-value { min-width:3ch; font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:.04em; color:#d8c9a8; }
+ .switch-unit { width:120px; display:grid; gap:6px; align-content:start; }
+ .io .meter.input, .io .meter.output { position:relative; left:auto; right:auto; top:auto; width:12px; height:72px; margin:8px auto 0; }
+ .help-strip { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; text-align:center; font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:.02em; color:#b6a9bd; }
+ .footerbar { grid-template-columns:auto minmax(0,1fr) auto; column-gap:12px; }
+ .switch:focus-visible, .spec-toggle:focus-visible, .select-trigger:focus-visible, .select-option:focus-visible { outline:2px solid rgba(189,131,214,.7); outline-offset:3px; }
+ /* ── Header grid: brand block on the left, two aligned control cells on the right ── */
+ .topbar { top:12px; height:64px; }
+ .brand { display:grid; justify-items:start; align-content:center; gap:2px; min-width:0; }
+ .brand .name { font-size:24px; line-height:1; letter-spacing:.11em; }
+ .brand .tag { line-height:1.2; }
+ .brand .signature { font-size:14px; line-height:1.1; padding:0; color:#9a6fb0; text-shadow:0 0 14px rgba(176,111,208,.34); }
+ .top-actions { display:grid; grid-template-columns:132px 112px; grid-template-rows:auto 32px; column-gap:16px; row-gap:6px; align-items:center; }
+ .top-actions .field { display:contents; }
+ .top-actions .field-label { white-space:nowrap; }
+ .top-actions .oversampling .field-label { grid-column:1; grid-row:1; }
+ .top-actions .oversampling .popup-select { grid-column:1; grid-row:2; margin-top:0; }
+ .top-actions .oversampling .select-trigger { height:32px; box-sizing:border-box; }
+ .top-actions .process-field .field-label { grid-column:2; grid-row:1; }
+ .top-actions .process-field .switch-row { grid-column:2; grid-row:2; height:32px; }
+ .display-wrap { top:88px; }
+ .io { top:88px; }
+ /* One shared content margin: header, divider, bottom panel and footer all end at x = 32 px. */
+ .topbar, .bottom-panel, .footerbar { left:32px; right:32px; }
+ .brand-row { display:flex; align-items:baseline; gap:12px; min-width:0; }
+ /* Author line: top centre of the header. Absolute, so it does not affect the brand grid. */
+ .brand .signature { position:absolute; top:2px; left:50%; transform:translateX(-50%); white-space:nowrap; }
+ /* Knob centre line sits on the CHARACTER select centre (shell y 377). */
+ .amount, .phon, .density, .mix { top:36px; }
+ .brand .signature { font-size:18px; line-height:1; }
+ .top-actions { grid-template-columns:132px max-content; width:max-content; justify-self:end; }
+ .top-actions .process-field { width:max-content; }
+ .top-actions .process-field .switch-row { width:max-content; }
 </style>
 </head>
 <body>
 <div class="shell" id="plugin">
  <span class="screw s1"></span><span class="screw s2"></span><span class="screw s3"></span><span class="screw s4"></span>
  <div class="topbar">
- <div class="brand"><div class="name">PHON</div><div class="tag">Perceptual Harmonic Inflator</div></div>
+ <div class="brand"><div class="brand-row"><div class="name">PHONTOM</div><div class="signature">By Mykyta Shchur</div></div><div class="tag">Perceptual Harmonic Inflator</div></div>
  <div class="top-actions">
- <div class="process-top">
- <span class="process-caption">PROCESS</span>
- <div class="bypass-button on" id="processButton" role="button" tabindex="0" aria-label="Process" aria-pressed="true" data-tip="Увімкнення або байпас усього процесора."></div>
+ <div class="oversampling field">
+ <div class="field-label">Oversampling</div>
+ <div class="popup-select" id="oversamplingSelect" data-select="oversampling">
+ <button class="select-trigger" id="oversamplingTrigger" type="button" aria-haspopup="menu" aria-expanded="false" data-tip="Вибір внутрішнього oversampling. OFF залишає нативну частоту дискретизації.">
+ <span class="select-value">OFF</span><span class="select-chevron">▾</span>
+ </button>
+ <div class="select-menu" role="menu" aria-label="Oversampling mode">
+ <button class="select-option active" type="button" role="menuitem" data-value="OFF"><b>OFF</b><span>Native sample rate</span></button>
+ <button class="select-option" type="button" role="menuitem" data-value="2×"><b>2×</b><span>Low CPU / tracking</span></button>
+ <button class="select-option" type="button" role="menuitem" data-value="4×"><b>4×</b><span>Balanced quality</span></button>
+ <button class="select-option" type="button" role="menuitem" data-value="8×"><b>8×</b><span>Maximum quality</span></button>
+ </div>
+ </div>
+ </div>
+ <div class="field process-field">
+ <span class="field-label">Process</span>
+ <div class="switch-row">
+ <button class="switch on" id="processButton" type="button" role="switch" aria-label="Process" aria-checked="true" data-tip="Вмикає або вимикає обробку. OFF пропускає сигнал без змін."><span class="switch-thumb"></span></button>
+ <span class="state-value" id="processState">ON</span>
+ </div>
  </div>
  </div>
  </div>
@@ -234,18 +336,18 @@
  <div class="label">Input</div>
  <div class="knob small" data-id="input" data-min="-12" data-max="12" data-value="0" data-default="0" data-unit=" dB" data-tip="Вхідний трім перед аналізатором і генератором гармонік."><div class="knob-face"></div></div>
  <div class="subvalue" data-readout="input">0.0 dB</div>
- </div>
  <div class="meter input"><div class="meter-fill" id="meterIn"></div></div>
+ </div>
 
  <div class="io output">
  <div class="label">Output</div>
  <div class="knob small" data-id="output" data-min="-12" data-max="12" data-value="0" data-default="0" data-unit=" dB" data-tip="Вихідний трім після Safe Peak."><div class="knob-face"></div></div>
  <div class="subvalue" data-readout="output">0.0 dB</div>
- </div>
  <div class="meter output"><div class="meter-fill" id="meterOut"></div></div>
+ </div>
 
  <div class="display-wrap" data-tip="Візуалізація віртуального рівня PHON, кривої слухової чутливості та ваг шести гармонічних смуг.">
- <div class="display-head"><div class="display-title">ISO 226 CORRELATION / HARMONIC WEIGHT</div><div class="phon-readout"><strong id="phonNumber">62</strong><span>PHON</span></div></div>
+ <div class="display-head"><div class="display-title">ISO 226 CORRELATION / HARMONIC WEIGHT</div><div class="spectrum-toggles" role="group" aria-label="Spectrum layers"><button class="spec-toggle on" type="button" data-layer="showPre" aria-pressed="true" data-tip="Спектр до обробки (вхід). Перемикає світлу криву.">PRE</button><button class="spec-toggle on" type="button" data-layer="showPost" aria-pressed="true" data-tip="Спектр після обробки (вихід). Перемикає бурштинову криву.">POST</button></div><div class="phon-readout"><strong id="phonNumber">62</strong><span>PHON</span></div></div>
  <canvas id="scope" width="996" height="380"></canvas>
  <div class="display-footer"><span>20 HZ</span><span>100</span><span>300</span><span>1K</span><span>3K</span><span>8K</span><span>16 KHZ</span></div>
  </div>
@@ -267,7 +369,7 @@
  </div>
 
  <div class="switch-unit">
- <span class="toggle-text">SAFE PEAK</span><div class="toggle on" id="safePeak" data-tip="Імітація true-peak захисту. У прототипі змінює поведінку вихідного індикатора."></div>
+ <span class="field-label">Safe Peak</span><div class="switch-row"><div class="switch on" id="safePeak" role="switch" tabindex="0" aria-checked="true" aria-label="Safe Peak" data-tip="Імітація true-peak захисту. У прототипі змінює поведінку вихідного індикатора."><span class="switch-thumb"></span></div><span class="state-value" id="safePeakState">ON</span></div>
  </div>
 
  <div class="knob-unit amount">
@@ -290,40 +392,24 @@
  <div class="knob-label">MIX</div><div class="knob-value" data-readout="mix">100%</div>
  </div>
 
- <div class="oversampling">
- <div class="label">Oversampling</div>
- <div class="popup-select" id="oversamplingSelect" data-select="oversampling">
- <button class="select-trigger" id="oversamplingTrigger" type="button" aria-haspopup="menu" aria-expanded="false" data-tip="Вибір внутрішнього oversampling. OFF залишає нативну частоту дискретизації.">
- <span class="select-led"></span><span class="select-value">OFF</span><span class="select-chevron">▾</span>
- </button>
- <div class="select-menu" role="menu" aria-label="Oversampling mode">
- <button class="select-option active" type="button" role="menuitem" data-value="OFF"><b>OFF</b><span>Native sample rate</span></button>
- <button class="select-option" type="button" role="menuitem" data-value="2×"><b>2×</b><span>Low CPU / tracking</span></button>
- <button class="select-option" type="button" role="menuitem" data-value="4×"><b>4×</b><span>Balanced quality</span></button>
- <button class="select-option" type="button" role="menuitem" data-value="8×"><b>8×</b><span>Maximum quality</span></button>
- </div>
- </div>
- </div>
  </div>
  <div class="footerbar">
- <div class="footer-left">RATOSAURUS LAB / UI PROTOTYPE 04</div>
- <div class="signature">By Mykyta Shchurr</div>
+ <div class="footer-left">RATTOSAURUS LAB / UI PROTOTYPE V4</div>
+ <div class="help-strip" id="helpStrip">Наведіть курсор на контрол</div>
  <div class="footer-right">HANDCRAFTED IN UKRAINE · NO AUDIO DSP</div>
- </div>
 </div>
-<div class="tooltip" id="tooltip"></div>
 <script>
 (() => {
  'use strict';
 
  const state = {
  input: 0, output: 0, amount: 38, phon: 64, density: 27, mix: 100,
- character: 'CLEAN', safePeak: true, process: true, oversampling: 'OFF'
+ character: 'CLEAN', safePeak: true, process: true, oversampling: 'OFF',
+ showPre: true, showPost: true
  };
 
  const canvas = document.getElementById('scope');
  const ctx = canvas.getContext('2d');
- const tooltip = document.getElementById('tooltip');
  const meterIn = document.getElementById('meterIn');
  const meterOut = document.getElementById('meterOut');
  let phase = 0;
@@ -392,7 +478,7 @@
  ctx.lineWidth = 2.2;
  ctx.shadowColor = 'rgba(230,163,60,.25)';
  ctx.shadowBlur = 8;
- ctx.stroke();
+ if (state.showPre) ctx.stroke();
  ctx.shadowBlur = 0;
 
  ctx.beginPath();
@@ -407,7 +493,7 @@
  ctx.lineWidth = 3;
  ctx.shadowColor = state.process ? 'rgba(230,163,60,.45)' : 'transparent';
  ctx.shadowBlur = 12;
- ctx.stroke();
+ if (state.showPost) ctx.stroke();
  ctx.restore();
 
  const virtualPhon = Math.round(30 + state.phon * .62 + state.input * .45 + state.amount * .06);
@@ -426,6 +512,7 @@
  knob.style.setProperty('--angle', `${-135 + norm * 270}deg`);
  knob.style.setProperty('--arc', `${norm * 270}deg`);
  knob.setAttribute('aria-valuenow', String(Math.round(nextValue * 10) / 10));
+ knob.setAttribute('aria-valuetext', formatValue(id, nextValue, knob.dataset.unit || ''));
 
  const readout = document.querySelector(`[data-readout="${id}"]`);
  if (readout) readout.textContent = formatValue(id, nextValue, knob.dataset.unit || '');
@@ -434,9 +521,13 @@
 
  const knobs = [...document.querySelectorAll('.knob[data-id]')];
  knobs.forEach(knob => {
+ const pointer = document.createElement('span');
+ pointer.className = 'knob-pointer';
+ knob.appendChild(pointer);
  knob.tabIndex = 0;
  knob.setAttribute('role', 'slider');
- knob.setAttribute('aria-label', knob.dataset.id);
+ const caption = knob.parentElement.querySelector('.label, .knob-label');
+ knob.setAttribute('aria-label', caption ? caption.textContent.trim() : knob.dataset.id);
  knob.setAttribute('aria-valuemin', knob.dataset.min);
  knob.setAttribute('aria-valuemax', knob.dataset.max);
 
@@ -534,16 +625,27 @@
  if (event.key === 'Escape') document.querySelectorAll('.popup-select.open').forEach(closeSelect);
  });
 
- document.getElementById('safePeak').addEventListener('click', event => {
- event.currentTarget.classList.toggle('on');
- state.safePeak = event.currentTarget.classList.contains('on');
+ const safePeakToggle = document.getElementById('safePeak');
+ function toggleSafePeak() {
+ state.safePeak = !state.safePeak;
+ safePeakToggle.classList.toggle('on', state.safePeak);
+ safePeakToggle.setAttribute('aria-checked', String(state.safePeak));
+ document.getElementById('safePeakState').textContent = state.safePeak ? 'ON' : 'OFF';
+ }
+ safePeakToggle.addEventListener('click', toggleSafePeak);
+ safePeakToggle.addEventListener('keydown', event => {
+ if (event.key === 'Enter' || event.key === ' ') {
+ event.preventDefault();
+ toggleSafePeak();
+ }
  });
 
  const processButton = document.getElementById('processButton');
  function toggleProcess() {
  state.process = !state.process;
  processButton.classList.toggle('on', state.process);
- processButton.setAttribute('aria-pressed', String(state.process));
+ processButton.setAttribute('aria-checked', String(state.process));
+ document.getElementById('processState').textContent = state.process ? 'ON' : 'OFF';
  draw();
  }
  processButton.addEventListener('click', toggleProcess);
@@ -554,16 +656,25 @@
  }
  });
 
+ document.querySelectorAll('.spec-toggle').forEach(button => {
+ button.addEventListener('click', () => {
+ const layer = button.dataset.layer;
+ state[layer] = !state[layer];
+ button.classList.toggle('on', state[layer]);
+ button.setAttribute('aria-pressed', String(state[layer]));
+ draw();
+ });
+ });
+
+ const helpStrip = document.getElementById('helpStrip');
+ const helpDefault = helpStrip.textContent;
  document.querySelectorAll('[data-tip]').forEach(element => {
- element.addEventListener('mouseenter', () => {
- tooltip.textContent = element.dataset.tip;
- tooltip.classList.add('show');
- });
- element.addEventListener('mousemove', event => {
- tooltip.style.left = `${event.clientX + 12}px`;
- tooltip.style.top = `${event.clientY + 12}px`;
- });
- element.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
+ const show = () => { helpStrip.textContent = element.dataset.tip; };
+ const hide = () => { helpStrip.textContent = helpDefault; };
+ element.addEventListener('mouseenter', show);
+ element.addEventListener('focus', show);
+ element.addEventListener('mouseleave', hide);
+ element.addEventListener('blur', hide);
  });
 
  function fitPrototypeToViewport() {

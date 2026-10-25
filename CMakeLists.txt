@@ -103,7 +103,7 @@ juce_add_binary_data(PHON_BinaryData
     NAMESPACE
         PhBinaryData
 )
-target_link_libraries(PHON PRIVATE PHON_BinaryData)
+target_link_libraries(PHON PRIVATE PHON_BinaryData juce::juce_dsp)
 
 # ── Tests ────────────────────────────────────────────────────────────────────
 option(BUILD_TESTS "Build the unit-test suite" OFF)
@@ -120,6 +120,8 @@ if(BUILD_TESTS)
     )
     target_include_directories(PHON_Tests PRIVATE Source/DSP)
     target_link_libraries(PHON_Tests PRIVATE juce::juce_core juce::juce_dsp)
+    # Tests and DSP headers #include <JuceHeader.h>, which is not generated for console apps.
+    juce_generate_juce_header(PHON_Tests)
     add_test(NAME PHON_Tests COMMAND PHON_Tests)
 endif()
 

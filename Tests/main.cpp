@@ -17,15 +17,20 @@ public:
 // =============================================================================
 int main (int argc, char* argv[])
 {
+    juce::ignoreUnused (argc, argv);
+
     PhTestRunner runner;
     runner.runAllTests();
 
+    // JUCE 7 has no failure counter on UnitTestRunner; sum the per-test results instead.
     const auto results = runner.getNumResults();
-    const auto fails   = runner.getNumFailures();
+    int fails = 0;
+    for (int i = 0; i < results; ++i)
+        fails += runner.getResult (i)->failures;
 
     juce::Logger::outputDebugString (
-        juce::String ("PHON tests complete — ")
-        + juce::String (results) + " tests, "
+        "PHON tests complete — "
+        + juce::String (results) + " test cases, "
         + juce::String (fails)   + " failures.");
 
     return fails > 0 ? 1 : 0;
